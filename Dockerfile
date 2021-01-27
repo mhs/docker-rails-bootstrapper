@@ -1,7 +1,7 @@
 FROM ruby:2.7.2-buster
 
 # set up app root
-WORKDIR /root/application
+WORKDIR /root/app
 
 # Add wait script to the image
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait ../wait
@@ -25,4 +25,4 @@ RUN curl -sL https://deb.nodesource.com/setup_lts.x | bash - && \
     apt-get -y install nodejs yarn less google-chrome-stable
 
 # set bundler path
-RUN bundle config path /root/application/vendor/bundle
+RUN bundle config path /root/app/vendor/bundle

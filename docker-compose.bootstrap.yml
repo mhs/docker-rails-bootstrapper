@@ -5,4 +5,4 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - .:/root/application # mounts code as local volume so dev image won't need rebuilds after code changes
+      - .:/root/app # mounts code as local volume so dev image won't need rebuilds after code changes

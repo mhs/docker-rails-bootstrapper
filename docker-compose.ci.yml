@@ -1,0 +1,15 @@
+version: '3'
+services:
+  db:
+    environment:
+      POSTGRES_PASSWORD: unsecured
+  web:
+    environment:
+      POSTGRES_PASSWORD: unsecured
+      RACK_ENV: test
+      RAILS_ENV: test
+      RAILS_LOG_TO_STDOUT: enabled
+    volumes:
+      - .:/root/app # mounts code as local volume for faster ci builds
+      - ./vendor/bundle:/root/app/vendor/bundle # can restore gems from cache
+      - ./node_modules:/root/app/node_modules # can restore node modules from cache

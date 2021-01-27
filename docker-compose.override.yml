@@ -11,9 +11,9 @@ services:
   web:
     env_file: .env
     volumes:
-      - gems:/root/application/vendor/bundle # persistent storage == faster updates
-      - node_modules:/root/application/node_modules # persistent storage == faster updates
-      - .:/root/application # mounts code as local volume so dev image won't need rebuilds after code changes
+      - gems:/root/app/vendor/bundle # persistent storage == faster updates
+      - node_modules:/root/app/node_modules # persistent storage == faster updates
+      - .:/root/app # mounts code as local volume so dev image won't need rebuilds after code changes
       - ./docker.bashrc:/root/.bashrc # allow per-developer bash config
       - ./docker.bash_history:/root/.bash_history # retain bash cli history in dev
       - ./docker.pry_history:/root/.pry_history # retail rails cli history in dev
