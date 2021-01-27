@@ -1,4 +1,7 @@
 version: '3'
+volumes:
+  gems:
+  node_modules:
 services:
   web:
     build:
@@ -6,3 +9,5 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/root/app # mounts code as local volume so dev image won't need rebuilds after code changes
+      - gems:/root/app/vendor/bundle # persistent storage == faster updates
+      - node_modules:/root/app/node_modules # persistent storage == faster updates

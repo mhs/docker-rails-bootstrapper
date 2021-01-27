@@ -1,22 +1,23 @@
 #!/bin/sh
-set -eux
+#set -euxo pipefail
 
 # TODO:
 # check for compose upfront
 # forward args to rails new
 
-echo $'\n=== Downloading bootstrapping files ==='
+# Downloading bootstrapping files
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/docker-compose.bootstrap.yml
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/Dockerfile
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/.dockerignore
 
-echo $'\n=== Bootstrapping Rails application ==='
+# Bootstrapping Rails application
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/Gemfile
 docker-compose -f docker-compose.bootstrap.yml build --no-cache
-docker-compose -f docker-compose.bootstrap.yml run web bundle install
-docker-compose -f docker-compose.bootstrap.yml run web bundle exec rails new . --database=postgresql
+docker-compose -f docker-compose.bootstrap.yml run web bash -c "bundle install --jobs 10 --retry 5"
+echo "hello!"
+docker-compose -f docker-compose.bootstrap.yml run web bash -c "bundle exec rails new . --database=postgresql --force"
 
-echo $'\n=== Swapping bootstrapping files for actual files ==='
+# Swapping bootstrapping files for actual files
 rm -f docker-compose.bootstrap.yml
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/docker-compose.yml
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/docker-compose.override.yml
