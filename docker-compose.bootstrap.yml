@@ -1,0 +1,8 @@
+version: '3'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/root/application # mounts code as local volume so dev image won't need rebuilds after code changes
