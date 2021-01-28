@@ -1,0 +1,9 @@
+build:
+  docker:
+    web: heroku.Dockerfile
+release:
+  image: web
+  command:
+    - bundle exec rails db:migrate db:seed
+run:
+  web: bundle exec rails server -b '0.0.0.0' -p $PORT

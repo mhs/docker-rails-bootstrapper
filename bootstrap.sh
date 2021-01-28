@@ -2,8 +2,8 @@
 set -eu
 
 # TODO:
-# ci, heroku
-# include setup scripting
+# include bin/setup scripting
+# repository name for app.json?
 # consolidate docker files
 # stop using database.yml, use DATABASE_URL instead
 
@@ -93,6 +93,17 @@ sed -i.bkp "s/# \(Dir\[Rails.root.join('spec', 'support'\)/\1/g" spec/rails_help
 curl -Lo config/database.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/database.yml
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" config/database.yml
 docker-compose run web bundle exec rails db:create db:migrate
+
+# set up GH Action-based CI
+mkdir -p .github/workflows
+curl -Lo .github/workflows/ci.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/ci.yml
+
+# set up review apps on Heroku
+curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.yml
+curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/app.json
+curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.Dockerfile
+sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" heroku.Dockerfile
+sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" app.json
 
 # cleanup
 rm -rf **/*.bkp docker-compose.bootstrap.yml test lib/tasks/.keep

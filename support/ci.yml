@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+    - main
+
+env:
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Restore cached gems
+      id: cache-gems
+      uses: actions/cache@v2
+      with:
+        path: ./vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys:  ${{ runner.os }}-gems-
+    - name: Restore cached packages
+      id: cache-packages
+      uses: actions/cache@v2
+      with:
+        path: ./node_modules
+        key: ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock') }}
+        restore-keys:  ${{ runner.os }}-node_modules-
+    - name: Build image
+      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml build --build-arg BUILDKIT_INLINE_CACHE=1
+    - name: Install gems
+      if: steps.cache-gems.outputs.cache-hit != 'true'
+      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle install --jobs 20 --retry 5
+    - name: Install packages
+      if: steps.cache-packages.outputs.cache-hit != 'true'
+      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web yarn install --check-files
+    - name: Validate code loading
+      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle exec rails zeitwerk:check
+    - name: Lint Ruby files
+      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle exec rails rubocop
+    - name: Scan for vulnerabilities
+      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle exec brakeman -Aqz
+    - name: Prepare database
+      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bash -c "../wait && bundle exec rails db:create db:schema:load"
+    - name: Run tests
+      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle exec rails spec
+    - name: Test asset compilation
+      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle exec rails assets:precompile
