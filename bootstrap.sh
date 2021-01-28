@@ -30,7 +30,11 @@ curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/d
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/docker-compose.override.yml
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.yml
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.override.yml
-touch ./docker.bashrc ./docker.bash_history ./docker.pry_history
+touch ./sample.docker.bashrc ./sample.docker.bash_history
+touch ./docker.bashrc ./docker.bash_history
+
+# append to .gitignore
+curl -L https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/additions.gitignore >> .gitignore
 
 # create, populate .env
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/.env

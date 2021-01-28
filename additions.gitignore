@@ -1,0 +1,10 @@
+
+# ignore file used to store secrets
+.env
+
+# macos is annoying sometimes
+**/.ds_store
+
+# these are intended to be overriden per-developer
+docker.bashrc
+docker.bash_history"
