@@ -86,7 +86,7 @@ curl -Lo spec/support/factory_bot.rb https://raw.githubusercontent.com/mhs/docke
 curl -Lo spec/support/capybara.rb https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/capybara.rb
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/.rubocop.yml
 curl -Lo lib/tasks/rubocop.rake https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/rubocop.rake
-# this uncomments the corresponding line in spec/rails_helper.rb
+# this uncomments the corresponding line in spec/rails_helper.rb to load our spec support files
 sed -i.bkp "s/# \(Dir\[Rails.root.join('spec', 'support'\)/\1/g" spec/rails_helper.rb
 
 # migrate the database and run setup
@@ -96,11 +96,14 @@ curl -Lo config/database.yml https://raw.githubusercontent.com/mhs/docker-rails-
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" config/database.yml
 docker-compose run web bundle exec rails db:prepare
 
-# set up GH Action-based CI
+# set up GH Action-based CI and do automatic corrections
 mkdir -p .github/workflows
 curl -Lo .github/workflows/ci.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/ci.yml
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.ci.yml
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.ci.yml
+docker-compose run web bundle exec rails rubocop:auto_correct
+# this uncomments the corresponding line in config/environments/production.rb to appease brakeman
+sed -i.bkp "s/ # \(config.force_ssl = true\)/\1/g" config/environments/production.rb
 
 # set up review apps on Heroku
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.yml
