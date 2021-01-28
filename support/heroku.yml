@@ -4,6 +4,6 @@ build:
 release:
   image: web
   command:
-    - bundle exec rails db:migrate db:seed
+    - bundle exec rails db:prepare
 run:
   web: bundle exec rails server -b '0.0.0.0' -p $PORT

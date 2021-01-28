@@ -6,6 +6,7 @@ set -eu
 # repository name for app.json?
 # consolidate docker files
 # stop using database.yml, use DATABASE_URL instead
+# use .bootstrap_step to record progress
 
 if ! command -v docker-compose &> /dev/null
 then
@@ -92,7 +93,7 @@ sed -i.bkp "s/# \(Dir\[Rails.root.join('spec', 'support'\)/\1/g" spec/rails_help
 # - postgres://postgres:${POSTGRES_PASSWORD}@db:5432/<app_name>_<env> ???
 curl -Lo config/database.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/database.yml
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" config/database.yml
-docker-compose run web bundle exec rails db:create db:migrate
+docker-compose run web bundle exec rails db:prepare
 
 # set up GH Action-based CI
 mkdir -p .github/workflows
@@ -106,4 +107,4 @@ sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" heroku.Dockerfile
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" app.json
 
 # cleanup
-rm -rf **/*.bkp docker-compose.bootstrap.yml test lib/tasks/.keep
+rm -rf **/.*.bkp **/*.bkp docker-compose.bootstrap.yml test lib/tasks/.keep

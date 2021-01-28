@@ -45,7 +45,7 @@ jobs:
     - name: Scan for vulnerabilities
       run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle exec brakeman -Aqz
     - name: Prepare database
-      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bash -c "../wait && bundle exec rails db:create db:schema:load"
+      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bash -c "../wait && bundle exec rails db:prepare"
     - name: Run tests
       run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle exec rails spec
     - name: Test asset compilation
