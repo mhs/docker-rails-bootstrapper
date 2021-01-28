@@ -25,7 +25,6 @@ docker-compose -f docker-compose.bootstrap.yml run web bundle install --jobs 10 
 docker-compose -f docker-compose.bootstrap.yml run web bundle exec rails new . --database=postgresql --force
 
 # Swap bootstrapping docker files for application docker files
-rm -f docker-compose.bootstrap.yml
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/docker-compose.yml
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/docker-compose.override.yml
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.yml
@@ -35,6 +34,23 @@ touch ./docker.bashrc ./docker.bash_history
 
 # append to .gitignore
 curl -L https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/additions.gitignore >> .gitignore
+
+# set up default gems
+echo "
+# TODO: move automatically-installed gems to the appropriate blocks:" >> Gemfile
+docker-compose run web bundle add --group development,test rspec-rails \
+                                                           factory_bot_rails \
+                                                           rubocop-rails \
+                                                           rubocop-rails_config rubocop-performance rubocop-rspec \
+                                                           brakeman
+docker-compose run web bundle exec rails generate rspec:install
+mkdir -p spec/support
+curl -Lo spec/support/factory_bot.rb https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/factory_bot.rb
+curl -Lo spec/support/capybara.rb https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/capybara.rb
+curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/.rubocop.yml
+curl -Lo lib/tasks/rubocop.rake https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/rubocop.rake
+# this uncomments the corresponding line in spec/rails_helper.rb
+sed -i.bkp "s/# \(Dir\[Rails.root.join('spec', 'support'\)/\1/g" spec/rails_helper.rb
 
 # create, populate .env
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/.env
@@ -53,4 +69,4 @@ sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" config/database.yml
 docker-compose run web bundle exec rails db:create db:migrate
 
 # cleanup
-rm -f *.bkp
+rm -f **/*.bkp docker-compose.bootstrap.yml test lib/tasks/.keep

@@ -1,0 +1,15 @@
+inherit_gem:
+  rubocop-rails_config:
+    - config/rails.yml
+
+require:
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rspec
+
+# OVERRIDES:
+Layout/EmptyLinesAroundAccessModifier:
+  EnforcedStyle: around
+
+Layout/IndentationConsistency:
+  EnforcedStyle: normal
