@@ -1,6 +1,6 @@
 {
   "name": "<APPLICATION_NAME>",
-  "repository": "FILL_IN_APP.JSON",
+  "repository": "<GITHUB_URL>",
   "stack": "container",
   "env": {
     "RACK_ENV": "production",

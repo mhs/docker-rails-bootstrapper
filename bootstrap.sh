@@ -16,6 +16,7 @@ then
 fi
 
 echo "Enter the name of the application (lowercase, snakecase, not an existing directory)"
+echo "The application will be built in a directory with the corresponding name"
 read -p "application name: " application_name
 if [ -z "$application_name" ]
 then
@@ -28,6 +29,14 @@ then
   exit 1
 fi
 
+echo "Enter the ABSOLUTE url of the github repository which will house this application"
+echo "You must have full access for this to work nicely"
+read -p "github url: " github_url
+if [ -z "$github_url" ]
+then
+  echo "github url is not optional"
+  exit 1
+fi
 
 echo "Press return to generate a strong password for Postgres, or enter one if desired:"
 read -p "password: " postgres_password
@@ -111,6 +120,16 @@ curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/s
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.Dockerfile
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" heroku.Dockerfile
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" app.json
+# wonkiness replaces e.g. "http://"" with "http:\/\/"" to escape it for use by sed
+sed -i.bkp "s/<GITHUB_URL>/"${github_url//\//\\\/}"/g" app.json
 
 # cleanup
 rm -rf **/.*.bkp **/*.bkp docker-compose.bootstrap.yml test lib/tasks/.keep
+
+# push to GitHub
+git checkout -b main 2> /dev/null
+git branch -D master 2> /dev/null
+git add .
+git commit -m "Bootstrapped application"
+git remote add origin $github_url
+git push -u origin main
