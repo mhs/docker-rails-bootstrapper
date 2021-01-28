@@ -6,6 +6,7 @@ set -eu
 # repository name for app.json?
 # consolidate docker files
 # stop using database.yml, use DATABASE_URL instead
+# create rails app in one directory, then change to real one
 # use .bootstrap_step to record progress
 
 if ! command -v docker-compose &> /dev/null
@@ -98,6 +99,8 @@ docker-compose run web bundle exec rails db:prepare
 # set up GH Action-based CI
 mkdir -p .github/workflows
 curl -Lo .github/workflows/ci.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/ci.yml
+curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.ci.yml
+sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.ci.yml
 
 # set up review apps on Heroku
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.yml

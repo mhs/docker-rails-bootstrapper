@@ -10,6 +10,6 @@ services:
       RAILS_ENV: test
       RAILS_LOG_TO_STDOUT: enabled
     volumes:
-      - .:/root/app # mounts code as local volume for faster ci builds
+      - .:/root/<APPLICATION_NAME> # mounts code as local volume for faster ci builds
       - ./vendor/bundle:/root/app/vendor/bundle # can restore gems from cache
       - ./node_modules:/root/app/node_modules # can restore node modules from cache
