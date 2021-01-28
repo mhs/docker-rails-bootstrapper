@@ -1,5 +1,5 @@
 #!/bin/sh
-set -euxo pipefail
+set -eux
 
 # TODO:
 # test for existing directory
@@ -17,7 +17,6 @@ curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/D
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/.dockerignore
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.bootstrap.yml
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" Dockerfile
-rm -f *.bkp
 docker-compose -f docker-compose.bootstrap.yml build --no-cache
 
 # Bootstrap Rails application
@@ -25,10 +24,29 @@ curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/G
 docker-compose -f docker-compose.bootstrap.yml run web bundle install --jobs 10 --retry 5
 docker-compose -f docker-compose.bootstrap.yml run web bundle exec rails new . --database=postgresql --force
 
-# Swapping bootstrapping files for actual files
+# Swap bootstrapping docker files for application docker files
 rm -f docker-compose.bootstrap.yml
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/docker-compose.yml
 curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/docker-compose.override.yml
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.yml
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.override.yml
+touch ./docker.bashrc ./docker.bash_history ./docker.pry_history
+
+# create, populate .env
+curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/.env
+echo "Press return to generate a strong password for Postgres, or enter one if desired:"
+read -p "password: " postgres_password
+if [ -z $postgres_password ]
+then
+  echo "generating a password..."
+  postgres_password="$(cat /dev/urandom | base64 | tr -cd "[:upper:][:lower:][:digit:]" | head -c 32)"
+fi
+sed -i.bkp "s/<POSTGRES_PASSWORD>/$postgres_password/g" .env
+
+# migrate the database and run setup
+curl -Lo config/database.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/database.yml
+sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" config/database.yml
+docker-compose run web bundle exec rails db:create db:migrate
+
+# cleanup
 rm -f *.bkp
