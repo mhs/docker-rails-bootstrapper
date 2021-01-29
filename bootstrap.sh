@@ -3,6 +3,7 @@ set -eu
 
 # TODO:
 # include bin/setup scripting
+# add README.md
 # consolidate docker files
 # stop using database.yml, use DATABASE_URL instead
 # create rails app in one directory, then change to real one
@@ -13,8 +14,9 @@ if ! command -v docker-compose &> /dev/null; then
   exit 1
 fi
 
-echo "Enter the name of the application (lowercase, snakecase, not an existing directory)"
-echo "The application will be built in a directory with the corresponding name"
+echo $'\nEnter the name of the application (lowercase, snakecase, not an existing directory)'
+echo "The application will be built in a directory with this corresponding name"
+echo "It will also be used to initialize your Rails app"
 read -p "application name: " application_name
 if [ -z "$application_name" ]; then
   echo "application name is not optional"
@@ -25,7 +27,8 @@ if [ -d "$application_name" ]; then
   exit 1
 fi
 
-echo "Enter the ABSOLUTE url of the github remote this application will call 'origin'"
+echo $'\nEnter the ABSOLUTE url of the github remote this application will call "origin"'
+echo "This script will automatically set up a main branch, CI actions, and push an initial commit"
 echo "(e.g. github://github.com/user/repository.git)"
 read -p "github url: " github_url
 if [ -z "$github_url" ]; then
@@ -33,7 +36,9 @@ if [ -z "$github_url" ]; then
   exit 1
 fi
 
-echo "Press return to generate a strong password for Postgres, or enter one if desired:"
+echo $'\nPress return to generate a strong password for Postgres, or enter a specific one if desired'
+echo "You will be able to log into your database under the user 'postgres' using this password"
+echo "It will be stored in your .env file, which will not be committed by git"
 read -p "password: " postgres_password
 if [ -z $postgres_password ];
 then
