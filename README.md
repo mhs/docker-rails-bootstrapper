@@ -6,8 +6,8 @@ This script handles bootstrapping of a Dockerized Rails app which ticks all the 
 - installs and configures several "must-have" gems
 - revises the default Rails setup script to work with the Dockerized environment
 - sets up a CI Action using GitHub Actions
-- TODO: sets up Heroku review apps
-- Pushes an upstream "main" branch to GitHub with a single commit containing the bootstrapped application
+- adds files to support Heroku review apps
+- pushes an upstream "main" branch to GitHub with a single commit containing the bootstrapped application
 
 To run this script simply enter the following (or an equivalent) into your shell:
 
