@@ -46,28 +46,28 @@ mkdir $application_name
 cd $application_name
 
 echo $'\n== Bootstrapping Docker environment =='
-curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.bootstrap.yml 1> /dev/null
-curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/Dockerfile 1> /dev/null
-curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/.dockerignore 1> /dev/null
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.bootstrap.yml 1> /dev/null
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/Dockerfile 1> /dev/null
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/.dockerignore 1> /dev/null
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.bootstrap.yml
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" Dockerfile
 docker-compose -f docker-compose.bootstrap.yml build --no-cache
 
 echo $'\n== Bootstraping Rails application =='
-curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/Gemfile 1> /dev/null
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/Gemfile 1> /dev/null
 docker-compose -f docker-compose.bootstrap.yml run web bundle install --jobs 10 --retry 5
 docker-compose -f docker-compose.bootstrap.yml run web bundle exec rails new . --database=postgresql --force
 
 echo $'\n== Adding application Docker files =='
-curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.yml 1> /dev/null
-curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.override.yml 1> /dev/null
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.yml 1> /dev/null
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.override.yml 1> /dev/null
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.yml
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.override.yml
 touch ./sample.docker.bashrc ./sample.docker.bash_history ./sample.docker.pry_history
 touch ./docker.bashrc ./docker.bash_history ./docker.pry_history
 
 echo $'\n== Creating .env =='
-curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/.env 1> /dev/null
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/.env 1> /dev/null
 cp .env sample.env
 sed -i.bkp "s/<POSTGRES_PASSWORD>/$postgres_password/g" .env
 
@@ -83,33 +83,33 @@ docker-compose run web bundle add --group development,test pry-byebug \
                                                            brakeman
 docker-compose run web bundle exec rails generate rspec:install
 mkdir -p spec/support
-curl -Lo spec/support/factory_bot.rb https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/factory_bot.rb 1> /dev/null
-curl -Lo spec/support/capybara.rb https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/capybara.rb 1> /dev/null
-curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/.rubocop.yml 1> /dev/null
-curl -Lo lib/tasks/rubocop.rake https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/rubocop.rake 1> /dev/null
+curl -sLo spec/support/factory_bot.rb https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/factory_bot.rb 1> /dev/null
+curl -sLo spec/support/capybara.rb https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/capybara.rb 1> /dev/null
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/.rubocop.yml 1> /dev/null
+curl -sLo lib/tasks/rubocop.rake https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/rubocop.rake 1> /dev/null
 # this uncomments the corresponding line in spec/rails_helper.rb to load our spec support files
 sed -i.bkp "s/# \(Dir\[Rails.root.join('spec', 'support'\)/\1/g" spec/rails_helper.rb
 
 echo $'\n== Preparing the database =='
 # TODO: use DATABASE_URL instead of overriding database.yml
 # - postgres://postgres:${POSTGRES_PASSWORD}@db:5432/<app_name>_<env> ???
-curl -Lo config/database.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/database.yml 1> /dev/null
+curl -sLo config/database.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/database.yml 1> /dev/null
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" config/database.yml
 docker-compose run web bundle exec rails db:prepare
 
 echo $'\n== Setting up CI =='
 mkdir -p .github/workflows
-curl -Lo .github/workflows/ci.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/ci.yml 1> /dev/null
-curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.ci.yml 1> /dev/null
+curl -sLo .github/workflows/ci.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/ci.yml 1> /dev/null
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.ci.yml 1> /dev/null
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.ci.yml
 docker-compose run web bundle exec rails rubocop:auto_correct
 # this uncomments the corresponding line in config/environments/production.rb to appease brakeman
 sed -i.bkp "s/ # \(config.force_ssl = true\)/\1/g" config/environments/production.rb
 
 echo $'\n== Setting up review apps =='
-curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.yml 1> /dev/null
-curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/app.json 1> /dev/null
-curl -LJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.Dockerfile 1> /dev/null
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.yml 1> /dev/null
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/app.json 1> /dev/null
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.Dockerfile 1> /dev/null
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" heroku.Dockerfile
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" app.json
 # wonkiness replaces e.g. "http://"" with "http:\/\/"" to escape it for use by sed
@@ -120,7 +120,7 @@ rm -rf ./**/.*.bkp ./**/*.bkp ./docker-compose.bootstrap.yml ./test ./lib/tasks/
 docker-compose down
 
 echo $'\n== Setting up git integration =='
-curl -L https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/additions.gitignore >> .gitignore 1> /dev/null
+curl -sL https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/additions.gitignore >> .gitignore 1> /dev/null
 git checkout -b main &> /dev/null
 git add .
 git commit -m "Bootstrapped application"
