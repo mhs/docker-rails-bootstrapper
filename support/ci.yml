@@ -31,22 +31,22 @@ jobs:
         key: ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock') }}
         restore-keys:  ${{ runner.os }}-node_modules-
     - name: Build image
-      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml build --build-arg BUILDKIT_INLINE_CACHE=1
+      run: docker-compose -f docker-compose.yml -f docker_support/docker-compose.ci.yml build --build-arg BUILDKIT_INLINE_CACHE=1
     - name: Install gems
       if: steps.cache-gems.outputs.cache-hit != 'true'
-      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle install --jobs 20 --retry 5
+      run: docker-compose -f docker-compose.yml -f docker_support/docker-compose.ci.yml run web bundle install --jobs 20 --retry 5
     - name: Install packages
       if: steps.cache-packages.outputs.cache-hit != 'true'
-      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web yarn install --check-files
+      run: docker-compose -f docker-compose.yml -f docker_support/docker-compose.ci.yml run web yarn install --check-files
     - name: Validate code loading
-      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle exec rails zeitwerk:check
+      run: docker-compose -f docker-compose.yml -f docker_support/docker-compose.ci.yml run web bundle exec rails zeitwerk:check
     - name: Lint Ruby files
-      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle exec rails rubocop
+      run: docker-compose -f docker-compose.yml -f docker_support/docker-compose.ci.yml run web bundle exec rails rubocop
     - name: Scan for vulnerabilities
-      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle exec brakeman -Aqz
+      run: docker-compose -f docker-compose.yml -f docker_support/docker-compose.ci.yml run web bundle exec brakeman -Aqz
     - name: Prepare database
-      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bash -c "../wait && bundle exec rails db:prepare"
+      run: docker-compose -f docker-compose.yml -f docker_support/docker-compose.ci.yml run web bash -c "../wait && bundle exec rails db:prepare"
     - name: Run tests
-      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle exec rails spec
+      run: docker-compose -f docker-compose.yml -f docker_support/docker-compose.ci.yml run web bundle exec rails spec
     - name: Test asset compilation
-      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml run web bundle exec rails assets:precompile
+      run: docker-compose -f docker-compose.yml -f docker_support/docker-compose.ci.yml run web bundle exec rails assets:precompile

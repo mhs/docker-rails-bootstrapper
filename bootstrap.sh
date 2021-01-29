@@ -2,7 +2,6 @@
 set -eu
 
 # TODO:
-# consolidate docker files
 # create heroku pipeline?
 # stop using database.yml, use DATABASE_URL instead
 # create rails app in one directory, then change to real one
@@ -37,7 +36,7 @@ fi
 
 echo $'\nPress return to generate a strong password for Postgres, or enter a specific one if desired'
 echo "You will be able to log into your database under the user 'postgres' using this password"
-echo "It will be stored in your .env file, which will not be committed by git"
+echo "It will be stored in your docker_support/.env file, which will not be committed by git"
 read -p "password: " postgres_password
 if [ -z $postgres_password ]; then
   echo "generating a password..."
@@ -47,13 +46,14 @@ fi
 # Set up workspace
 mkdir $application_name
 cd $application_name
+mkdir docker_support
 
 echo $'\n== Bootstrapping Docker environment =='
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.bootstrap.yml 1> /dev/null
-curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/Dockerfile 1> /dev/null
+curl -sLo docker_support/Dockerfile https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/Dockerfile 1> /dev/null
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/.dockerignore 1> /dev/null
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.bootstrap.yml
-sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" Dockerfile
+sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker_support/Dockerfile
 docker-compose -f docker-compose.bootstrap.yml build --no-cache
 
 echo $'\n== Bootstraping Rails application =='
@@ -66,13 +66,13 @@ curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.override.yml 1> /dev/null
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.yml
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.override.yml
-touch ./sample.docker.bashrc ./sample.docker.bash_history ./sample.docker.pry_history
-touch ./docker.bashrc ./docker.bash_history ./docker.pry_history
+touch ./docker_support/sample.docker.bashrc ./docker_support/sample.docker.bash_history ./docker_support/sample.docker.pry_history
+touch ./docker_support/docker.bashrc ./docker_support/docker.bash_history ./docker_support/docker.pry_history
 
-echo $'\n== Creating .env =='
-curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/.env 1> /dev/null
-cp .env sample.env
-sed -i.bkp "s/<POSTGRES_PASSWORD>/$postgres_password/g" .env
+echo $'\n== Creating docker_support/.env =='
+curl -sLo docker_support/.env https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/.env 1> /dev/null
+cp docker_support/.env docker_support/sample.env
+sed -i.bkp "s/<POSTGRES_PASSWORD>/$postgres_password/g" docker_support/.env
 
 echo $'\n== Adding and configuring default gems =='
 echo "
@@ -108,8 +108,8 @@ chmod +x bin/setup
 echo $'\n== Setting up CI =='
 mkdir -p .github/workflows
 curl -sLo .github/workflows/ci.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/ci.yml 1> /dev/null
-curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.ci.yml 1> /dev/null
-sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.ci.yml
+curl -sLo docker_support/docker-compose.ci.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.ci.yml 1> /dev/null
+sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker_support/docker-compose.ci.yml
 docker-compose run web bundle exec rails rubocop:auto_correct
 # this uncomments the corresponding line in config/environments/production.rb to appease brakeman
 sed -i.bkp "s/ # \(config.force_ssl = true\)/\1/g" config/environments/production.rb
@@ -117,8 +117,8 @@ sed -i.bkp "s/ # \(config.force_ssl = true\)/\1/g" config/environments/productio
 echo $'\n== Setting up review apps =='
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.yml 1> /dev/null
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/app.json 1> /dev/null
-curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.Dockerfile 1> /dev/null
-sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" heroku.Dockerfile
+curl -sLo docker_support/heroku.Dockerfile https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.Dockerfile 1> /dev/null
+sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker_support/heroku.Dockerfile
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" app.json
 # wonkiness replaces e.g. "http://"" with "http:\/\/"" to escape it for use by sed
 sed -i.bkp "s/<GITHUB_URL>/"${github_url//\//\\\/}"/g" app.json

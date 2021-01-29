@@ -6,7 +6,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker_support/Dockerfile
     volumes:
       - .:/root/<APPLICATION_NAME> # mounts code as local volume so dev image won't need rebuilds after code changes
       - gems:/root/<APPLICATION_NAME>/vendor/bundle # persistent storage == faster updates

@@ -5,7 +5,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker_support/Dockerfile
     # We must run a couple commands before we can safely start the server:
     # - ../wait for the db to begin accepting connections (ref: https://github.com/ufoscout/docker-compose-wait)
     # - remove server.pid, as past runs may have left it behind, thus preventing startup

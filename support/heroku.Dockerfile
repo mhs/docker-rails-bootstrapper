@@ -24,8 +24,6 @@ RUN curl -sL https://deb.nodesource.com/setup_lts.x | bash - && \
 #  - less for paging in dev consoles
     apt-get install nodejs yarn less
 
-# END MATCHING DOCKERFILE
-
 # install gems
 COPY Gemfile Gemfile.lock ./
 RUN bundle install --jobs 20 --retry 5
