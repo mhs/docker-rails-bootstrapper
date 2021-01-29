@@ -5,5 +5,5 @@ public/packs
 # don't copy node_modules - use the ones yarn installed
 node_modules/
 
-# ignore file used to store secrets
-docker_support/.env
+# support files aren't needed inside a container
+docker_support
