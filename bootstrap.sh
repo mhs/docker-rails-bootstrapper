@@ -2,8 +2,8 @@
 set -eu
 
 # TODO:
-# add README.md
 # consolidate docker files
+# create heroku pipeline?
 # stop using database.yml, use DATABASE_URL instead
 # create rails app in one directory, then change to real one
 # use .bootstrap_step to record progress
