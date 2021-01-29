@@ -2,7 +2,6 @@
 set -eu
 
 # TODO:
-# fix gitignore adds
 # add README.md
 # consolidate docker files
 # stop using database.yml, use DATABASE_URL instead
@@ -129,7 +128,7 @@ rm -rf ./**/.*.bkp ./**/*.bkp ./docker-compose.bootstrap.yml ./test ./lib/tasks/
 docker-compose down
 
 echo $'\n== Setting up git integration =='
-curl -sL https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/additions.gitignore >> .gitignore 1> /dev/null
+curl -sL https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/additions.gitignore >> .gitignore
 git checkout -b main &> /dev/null
 git add .
 git commit -m "Bootstrapped application"
