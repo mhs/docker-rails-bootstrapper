@@ -8,8 +8,7 @@ set -eu
 # create rails app in one directory, then change to real one
 # use .bootstrap_step to record progress
 
-if ! command -v docker-compose &> /dev/null
-then
+if ! command -v docker-compose &> /dev/null; then
   echo "the docker-compose command is required to run this script"
   exit 1
 fi
@@ -17,13 +16,11 @@ fi
 echo "Enter the name of the application (lowercase, snakecase, not an existing directory)"
 echo "The application will be built in a directory with the corresponding name"
 read -p "application name: " application_name
-if [ -z "$application_name" ]
-then
+if [ -z "$application_name" ]; then
   echo "application name is not optional"
   exit 1
 fi
-if [ -d "$application_name" ]
-then
+if [ -d "$application_name" ]; then
   echo "directory already exists"
   exit 1
 fi
@@ -31,15 +28,14 @@ fi
 echo "Enter the ABSOLUTE url of the github remote this application will call 'origin'"
 echo "(e.g. github://github.com/user/repository.git)"
 read -p "github url: " github_url
-if [ -z "$github_url" ]
-then
+if [ -z "$github_url" ]; then
   echo "github url is not optional"
   exit 1
 fi
 
 echo "Press return to generate a strong password for Postgres, or enter one if desired:"
 read -p "password: " postgres_password
-if [ -z $postgres_password ]
+if [ -z $postgres_password ];
 then
   echo "generating a password..."
   postgres_password="$(cat /dev/urandom | base64 | tr -cd "[:upper:][:lower:][:digit:]" | head -c 32)"
