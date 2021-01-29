@@ -2,7 +2,6 @@
 set -eu
 
 # TODO:
-# create heroku pipeline?
 # stop using database.yml, use DATABASE_URL instead
 # create rails app in one directory, then change to real one
 # use .bootstrap_step to record progress
@@ -114,13 +113,13 @@ docker-compose run web bundle exec rails rubocop:auto_correct
 # this uncomments the corresponding line in config/environments/production.rb to appease brakeman
 sed -i.bkp "s/ # \(config.force_ssl = true\)/\1/g" config/environments/production.rb
 
-echo $'\n== Setting up review apps =='
+echo $'\n== Adding support for Heroku review apps =='
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.yml 1> /dev/null
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/app.json 1> /dev/null
 curl -sLo docker_support/heroku.Dockerfile https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.Dockerfile 1> /dev/null
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker_support/heroku.Dockerfile
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" app.json
-# wonkiness replaces e.g. "http://"" with "http:\/\/"" to escape it for use by sed
+# wonkiness replaces e.g. "https://"" with "https:\/\/"" to escape it for use by sed
 sed -i.bkp "s/<GITHUB_URL>/"${github_url//\//\\\/}"/g" app.json
 
 echo $'\n== Sweeping the floor =='
