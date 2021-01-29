@@ -2,7 +2,7 @@
 set -eu
 
 # TODO:
-# include bin/setup scripting
+# fix gitignore adds
 # add README.md
 # consolidate docker files
 # stop using database.yml, use DATABASE_URL instead
@@ -40,8 +40,7 @@ echo $'\nPress return to generate a strong password for Postgres, or enter a spe
 echo "You will be able to log into your database under the user 'postgres' using this password"
 echo "It will be stored in your .env file, which will not be committed by git"
 read -p "password: " postgres_password
-if [ -z $postgres_password ];
-then
+if [ -z $postgres_password ]; then
   echo "generating a password..."
   postgres_password="$(cat /dev/urandom | base64 | tr -cd "[:upper:][:lower:][:digit:]" | head -c 32)"
 fi
@@ -101,6 +100,11 @@ echo $'\n== Preparing the database =='
 curl -sLo config/database.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/database.yml 1> /dev/null
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" config/database.yml
 docker-compose run web bundle exec rails db:prepare
+
+echo $'\n== Revising setup scripts =='
+mv bin/setup bin/rails_setup
+curl -sLo bin/setup https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/setup 1> /dev/null
+chmod +x bin/setup
 
 echo $'\n== Setting up CI =='
 mkdir -p .github/workflows

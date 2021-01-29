@@ -1,0 +1,47 @@
+#!/bin/sh
+
+if ! command -v docker-compose &> /dev/null; then
+  echo "the docker-compose command is required to run this script"
+  exit 1
+fi
+
+echo $'== Copying sample files =='
+if [ ! -f .env ]; then
+  cp sample.env .env
+fi
+if [ ! -f docker.bashrc ]; then
+  cp sample.docker.bashrc docker.bashrc
+fi
+if [ ! -f docker.bash_history ]; then
+  cp sample.docker.bash_history docker.bash_history
+fi
+if [ ! -f docker.pry_history ]; then
+  cp sample.docker.pry_history docker.pry_history
+fi
+
+echo $'\n== Ensuring database initialization requirements are met =='
+if grep -Fq "{postgres_password_placeholder}" .env; then
+  echo $'\nPress return to generate a strong password for Postgres, or enter a specific one if desired'
+  echo "You will be able to log into your database under the user 'postgres' using this password"
+  echo "It will be stored in your .env file, which will not be committed by git"
+  read -p "password: " postgres_password
+  if [ -z $postgres_password ]; then
+    echo "generating a password..."
+    postgres_password="$(cat /dev/urandom | base64 | tr -cd "[:upper:][:lower:][:digit:]" | head -c 32)"
+  fi
+  sed -i.bkp "s/<POSTGRES_PASSWORD>/$postgres_password/g" .env
+  rm -f .env.bkp
+fi
+
+echo $'\n== Building Docker container =='
+docker-compose build --no-cache
+
+echo $'\n== Running Rails setup =='
+docker-compose run web bash -c "../wait && ./bin/rails_setup"
+
+echo $'\n== Sweeping the floor =='
+docker-compose down
+
+echo $'\n==    Setup finished successfully!     =='
+echo    "== 'docker-compose up' to start server =="
+echo    "==    0.0.0.0:3000 to visit homepage   ==
