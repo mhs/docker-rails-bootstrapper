@@ -44,4 +44,4 @@ docker-compose down
 
 echo $'\n==    Setup finished successfully!     =='
 echo    "== 'docker-compose up' to start server =="
-echo    "==    0.0.0.0:3000 to visit homepage   ==
+echo    "==    0.0.0.0:3000 to visit homepage   =="
