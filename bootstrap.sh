@@ -11,6 +11,11 @@ if ! command -v docker-compose &> /dev/null; then
   exit 1
 fi
 
+if ! docker info &> /dev/null; then
+  echo "the docker daemon must be running to use this script"
+  exit 1
+fi
+
 echo $'\nEnter the name of the application (lowercase, snakecase, not an existing directory)'
 echo "The application will be built in a directory with this corresponding name"
 echo "It will also be used to initialize your Rails app"

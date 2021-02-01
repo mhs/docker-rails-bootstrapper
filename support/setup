@@ -5,6 +5,11 @@ if ! command -v docker-compose &> /dev/null; then
   exit 1
 fi
 
+if ! docker info &> /dev/null; then
+  echo "the docker daemon must be running to use this script"
+  exit 1
+fi
+
 echo $'== Copying sample files =='
 if [ ! -f docker_support/.env ]; then
   cp docker_support/sample.env docker_support/.env
