@@ -136,11 +136,21 @@ sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" app.json
 sed -i.bkp "s/<GITHUB_URL>/"${github_url//\//\\\/}"/g" app.json
 
 progress_text "Sweeping the floor"
-rm -f **/.*.bkp
-rm -f **/*.bkp
-rm -f lib/tasks/.keep
-rm -f docker-compose.bootstrap.yml
-rm -rf test
+rm -rf docker-compose.bootstrap.yml.bkp \
+       docker_support/Dockerfile.bkp \
+       docker-compose.yml.bkp \
+       compose.override.yml.bkp \
+       docker_support/.env.bkp \
+       spec/rails_helper.rb.bkp \
+       config/database.yml.bkp \
+       README.md.bkp \
+       docker_support/docker-compose.ci.yml.bkp \
+       config/environments/production.rb.bkp \
+       docker_support/heroku.Dockerfile.bkp \
+       app.json.bkp \
+       lib/tasks/.keep \
+       docker-compose.bootstrap.yml \
+       test
 docker-compose down
 
 progress_text "Setting up git integration"
