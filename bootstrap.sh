@@ -139,7 +139,7 @@ progress_text "Sweeping the floor"
 rm -rf docker-compose.bootstrap.yml.bkp \
        docker_support/Dockerfile.bkp \
        docker-compose.yml.bkp \
-       compose.override.yml.bkp \
+       docker-compose.override.yml.bkp \
        docker_support/.env.bkp \
        spec/rails_helper.rb.bkp \
        config/database.yml.bkp \
