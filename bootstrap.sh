@@ -129,8 +129,8 @@ sed -i.bkp "s/ # \(config.force_ssl = true\)/\1/g" config/environments/productio
 progress_text "Adding support for Heroku review apps"
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.yml 1> /dev/null
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/app.json 1> /dev/null
-curl -sLo docker_support/heroku.Dockerfile https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.Dockerfile 1> /dev/null
-sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker_support/heroku.Dockerfile
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.Dockerfile 1> /dev/null
+sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" heroku.Dockerfile
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" app.json
 # wonkiness replaces e.g. "https://"" with "https:\/\/"" to escape it for use by sed
 sed -i.bkp "s/<GITHUB_URL>/"${github_url//\//\\\/}"/g" app.json
@@ -146,7 +146,7 @@ rm -rf docker-compose.bootstrap.yml.bkp \
        README.md.bkp \
        docker_support/docker-compose.ci.yml.bkp \
        config/environments/production.rb.bkp \
-       docker_support/heroku.Dockerfile.bkp \
+       heroku.Dockerfile.bkp \
        app.json.bkp \
        lib/tasks/.keep \
        docker-compose.bootstrap.yml \

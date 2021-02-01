@@ -61,7 +61,7 @@ The bootstrapping script added several files which will help you get set up on H
 
 - `app.json` contains a template used to configure applications within your pipeline
 - `heroku.yml` describes how to build and serve your Dockerized application
-- `docker_support/heroku.Dockerfile` describes how to build an image to serve your application
+- `heroku.Dockerfile` describes how to build an image to serve your application
 
 Once the pipeline is created connect it to GitHub and set up as normal
 

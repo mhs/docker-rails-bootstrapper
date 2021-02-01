@@ -1,6 +1,6 @@
 build:
   docker:
-    web: docker_support/heroku.Dockerfile
+    web: heroku.Dockerfile
 release:
   image: web
   command:
