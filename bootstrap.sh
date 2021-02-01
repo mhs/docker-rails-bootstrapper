@@ -2,6 +2,7 @@
 set -eu
 
 # TODO:
+# .bkp files not rm'ing?
 # stop using database.yml, use DATABASE_URL instead
 # create rails app in one directory, then change to real one
 # use .bootstrap_step to record progress
@@ -104,10 +105,12 @@ curl -sLo config/database.yml https://raw.githubusercontent.com/mhs/docker-rails
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" config/database.yml
 docker-compose run web bundle exec rails db:prepare
 
-echo $'\n== Revising setup scripts =='
+echo $'\n== Revising setup scripts, adding README =='
 mv bin/setup bin/rails_setup
 curl -sLo bin/setup https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/setup 1> /dev/null
 chmod +x bin/setup
+curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/README.md 1> /dev/null
+sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" README.md
 
 echo $'\n== Setting up CI =='
 mkdir -p .github/workflows
