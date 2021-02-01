@@ -9,7 +9,7 @@ set -eu
 
 progress_text()
 {
-  echo -e "\x1b[1;36m$1\x1b[0m"
+  echo -e "\n== $1 =="
 }
 
 if ! command -v docker-compose &> /dev/null; then
@@ -53,12 +53,12 @@ if [ -z $postgres_password ]; then
   postgres_password="$(cat /dev/urandom | base64 | tr -cd "[:upper:][:lower:][:digit:]" | head -c 32)"
 fi
 
-progress_text "\n== Setting up a workspace =="
+progress_text "Setting up a workspace"
 mkdir $application_name
 cd $application_name
 mkdir docker_support
 
-progress_text "\n== Bootstrapping Docker environment =="
+progress_text "Bootstrapping Docker environment"
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.bootstrap.yml 1> /dev/null
 curl -sLo docker_support/Dockerfile https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/Dockerfile 1> /dev/null
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/.dockerignore 1> /dev/null
@@ -66,12 +66,12 @@ sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.bootstrap.y
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker_support/Dockerfile
 docker-compose -f docker-compose.bootstrap.yml build --no-cache
 
-progress_text "\n== Bootstraping Rails application =="
+progress_text "Bootstraping Rails application"
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/Gemfile 1> /dev/null
 docker-compose -f docker-compose.bootstrap.yml run web bundle install --jobs 10 --retry 5
 docker-compose -f docker-compose.bootstrap.yml run web bundle exec rails new . --database=postgresql --force
 
-progress_text "\n== Adding application Docker files =="
+progress_text "Adding application Docker files"
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.yml 1> /dev/null
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.override.yml 1> /dev/null
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.yml
@@ -79,12 +79,12 @@ sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker-compose.override.ym
 touch ./docker_support/sample.docker.bashrc ./docker_support/sample.docker.bash_history ./docker_support/sample.docker.pry_history
 touch ./docker_support/docker.bashrc ./docker_support/docker.bash_history ./docker_support/docker.pry_history
 
-progress_text "\n== Creating docker_support/.env =="
+progress_text "Creating docker_support/.env"
 curl -sLo docker_support/.env https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/.env 1> /dev/null
 cp docker_support/.env docker_support/sample.env
 sed -i.bkp "s/<POSTGRES_PASSWORD>/$postgres_password/g" docker_support/.env
 
-progress_text "\n== Adding and configuring default gems =="
+progress_text "Adding and configuring default gems"
 echo "
 # TODO: move automatically-installed gems to the appropriate blocks:" >> Gemfile
 docker-compose run web bundle add pry-rails
@@ -103,21 +103,21 @@ curl -sLo lib/tasks/rubocop.rake https://raw.githubusercontent.com/mhs/docker-ra
 # this uncomments the corresponding line in spec/rails_helper.rb to load our spec support files
 sed -i.bkp "s/# \(Dir\[Rails.root.join('spec', 'support'\)/\1/g" spec/rails_helper.rb
 
-progress_text "\n== Preparing the database =="
+progress_text "Preparing the database"
 # TODO: use DATABASE_URL instead of overriding database.yml
 # - postgres://postgres:${POSTGRES_PASSWORD}@db:5432/<app_name>_<env> ???
 curl -sLo config/database.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/database.yml 1> /dev/null
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" config/database.yml
 docker-compose run web bundle exec rails db:prepare
 
-progress_text "\n== Revising setup scripts, adding README =="
+progress_text "Revising setup scripts, adding README"
 mv bin/setup bin/rails_setup
 curl -sLo bin/setup https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/setup 1> /dev/null
 chmod +x bin/setup
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/README.md 1> /dev/null
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" README.md
 
-progress_text "\n== Setting up CI =="
+progress_text "Setting up CI"
 mkdir -p .github/workflows
 curl -sLo .github/workflows/ci.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/ci.yml 1> /dev/null
 curl -sLo docker_support/docker-compose.ci.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.ci.yml 1> /dev/null
@@ -126,7 +126,7 @@ docker-compose run web bundle exec rails rubocop:auto_correct
 # this uncomments the corresponding line in config/environments/production.rb to appease brakeman
 sed -i.bkp "s/ # \(config.force_ssl = true\)/\1/g" config/environments/production.rb
 
-progress_text "\n== Adding support for Heroku review apps =="
+progress_text "Adding support for Heroku review apps"
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.yml 1> /dev/null
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/app.json 1> /dev/null
 curl -sLo docker_support/heroku.Dockerfile https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.Dockerfile 1> /dev/null
@@ -135,7 +135,7 @@ sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" app.json
 # wonkiness replaces e.g. "https://"" with "https:\/\/"" to escape it for use by sed
 sed -i.bkp "s/<GITHUB_URL>/"${github_url//\//\\\/}"/g" app.json
 
-progress_text "\n== Sweeping the floor =="
+progress_text "Sweeping the floor"
 rm -f **/.*.bkp
 rm -f **/*.bkp
 rm -f lib/tasks/.keep
@@ -143,7 +143,7 @@ rm -f docker-compose.bootstrap.yml
 rm -rf test
 docker-compose down
 
-progress_text "\n== Setting up git integration =="
+progress_text "Setting up git integration"
 curl -sL https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/additions.gitignore >> .gitignore
 git checkout -b main &> /dev/null
 git add .
