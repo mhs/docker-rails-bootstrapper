@@ -2,6 +2,8 @@
 set -eu
 
 # TODO:
+# colorize script output
+# functionize common calls
 # .bkp files not rm'ing?
 # stop using database.yml, use DATABASE_URL instead
 # create rails app in one directory, then change to real one
@@ -131,7 +133,7 @@ sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" app.json
 sed -i.bkp "s/<GITHUB_URL>/"${github_url//\//\\\/}"/g" app.json
 
 echo $'\n== Sweeping the floor =='
-rm -rf ./**/.*.bkp ./**/*.bkp ./docker-compose.bootstrap.yml ./test ./lib/tasks/.keep
+rm -rf **/.*.bkp **/*.bkp docker-compose.bootstrap.yml test lib/tasks/.keep
 docker-compose down
 
 echo $'\n== Setting up git integration =='
