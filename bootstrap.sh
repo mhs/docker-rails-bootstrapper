@@ -3,7 +3,6 @@ set -eu
 
 # TODO:
 # functionize common calls
-# .bkp files not rm'ing?
 # stop using database.yml, use DATABASE_URL instead
 # create rails app in one directory, then change to real one
 # use .bootstrap_step to record progress
