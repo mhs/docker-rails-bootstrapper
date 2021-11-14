@@ -1,4 +1,4 @@
-FROM ruby:2.7.4-buster
+FROM ruby:2.7.4-bullseye
 
 # set up app root
 WORKDIR /root/<APPLICATION_NAME>
