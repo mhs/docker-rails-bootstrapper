@@ -7,8 +7,9 @@ WORKDIR /root/<APPLICATION_NAME>
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait ../wait
 RUN chmod +x ../wait
 
-# use node LTS, not 10 (Debian default)
-RUN curl -sL https://deb.nodesource.com/setup_lts.x | bash - && \
+# pin to node v16 instead of debian default
+# this is the most recent LTS node version as of 2021-11
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
 # add yarn source to apt package sources
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
