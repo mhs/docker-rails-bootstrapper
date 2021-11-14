@@ -2,7 +2,7 @@
 # for crucial Docker infrastructure (e.g. Volumes). As many steps as possible should be made to match those in the
 # usual Dockerfile when changes are made
 
-FROM ruby:2.7.2-buster
+FROM ruby:2.7.4-buster
 
 # set up app root
 WORKDIR /root/<APPLICATION_NAME>
