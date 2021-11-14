@@ -4,7 +4,7 @@ FROM ruby:2.7.4-buster
 WORKDIR /root/<APPLICATION_NAME>
 
 # Add wait script to the image
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait ../wait
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait ../wait
 RUN chmod +x ../wait
 
 # pin to node v16 instead of debian default
