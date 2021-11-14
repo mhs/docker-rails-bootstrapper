@@ -14,16 +14,17 @@ RUN chmod +x ../wait
 # pin to node v16 instead of debian default
 # this is the most recent LTS node version as of 2021-11
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
-# add yarn source to apt package sources
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
 # update apt package lists
     apt-get update && \
 # install packages
 #  - nodejs for npm registry access
-#  - yarn for js package management
 #  - less for paging in dev consoles
-    apt-get install nodejs yarn less
+    apt-get install nodejs less
+
+# install yarn for package management
+RUN npm install -g yarn && \
+# set yarn version
+    yarn set version berry
 
 # install gems
 COPY Gemfile Gemfile.lock ./
