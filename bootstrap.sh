@@ -87,13 +87,13 @@ sed -i.bkp "s/<POSTGRES_PASSWORD>/$postgres_password/g" docker_support/.env
 progress_text "Adding and configuring default gems"
 echo "
 # TODO: move automatically-installed gems to the appropriate blocks:" >> Gemfile
-docker-compose run web bundle add pry-rails
 docker-compose run web bundle add --group development,test pry-byebug \
                                                            rspec-rails \
                                                            factory_bot_rails \
                                                            rubocop-rails \
                                                            rubocop-rails_config rubocop-performance rubocop-rspec \
                                                            brakeman
+docker-compose run web bundle add pry-rails
 docker-compose run web bundle exec rails generate rspec:install
 mkdir -p spec/support
 curl -sLo spec/support/factory_bot.rb https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/factory_bot.rb 1> /dev/null
@@ -122,9 +122,9 @@ mkdir -p .github/workflows
 curl -sLo .github/workflows/ci.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/ci.yml 1> /dev/null
 curl -sLo docker_support/docker-compose.ci.yml https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/docker-compose.ci.yml 1> /dev/null
 sed -i.bkp "s/<APPLICATION_NAME>/$application_name/g" docker_support/docker-compose.ci.yml
-docker-compose run web bundle exec rails rubocop:auto_correct
 # this uncomments the corresponding line in config/environments/production.rb to appease brakeman
 sed -i.bkp "s/ # \(config.force_ssl = true\)/\1/g" config/environments/production.rb
+docker-compose run web bundle exec rails rubocop:auto_correct
 
 progress_text "Adding support for Heroku review apps"
 curl -sLJO https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/heroku.yml 1> /dev/null
