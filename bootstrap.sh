@@ -87,13 +87,13 @@ sed -i.bkp "s/<POSTGRES_PASSWORD>/$postgres_password/g" docker_support/.env
 progress_text "Adding and configuring default gems"
 echo "
 # TODO: move automatically-installed gems to the appropriate blocks:" >> Gemfile
-docker-compose run web bundle add pry-rails
 docker-compose run web bundle add --group development,test pry-byebug \
                                                            rspec-rails \
                                                            factory_bot_rails \
                                                            rubocop-rails \
                                                            rubocop-rails_config rubocop-performance rubocop-rspec \
                                                            brakeman
+docker-compose run web bundle add pry-rails
 docker-compose run web bundle exec rails generate rspec:install
 mkdir -p spec/support
 curl -sLo spec/support/factory_bot.rb https://raw.githubusercontent.com/mhs/docker-rails-bootstrapper/main/support/factory_bot.rb 1> /dev/null
