@@ -22,9 +22,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
     apt-get -y install nodejs less google-chrome-stable
 
 # install yarn for package management
-RUN npm install -g yarn && \
-# set yarn version
-    yarn set version berry
+RUN npm install -g yarn
 
 # set bundler path
 RUN bundle config path /root/<APPLICATION_NAME>/vendor/bundle

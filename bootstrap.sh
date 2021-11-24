@@ -84,6 +84,9 @@ curl -sLo docker_support/.env https://raw.githubusercontent.com/mhs/docker-rails
 cp docker_support/.env docker_support/sample.env
 sed -i.bkp "s/<POSTGRES_PASSWORD>/$postgres_password/g" docker_support/.env
 
+progress_text "Configuring yarn"
+docker-compose run web yarn set version classic
+
 progress_text "Adding and configuring default gems"
 echo "
 # TODO: move automatically-installed gems to the appropriate blocks:" >> Gemfile
