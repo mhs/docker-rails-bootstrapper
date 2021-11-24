@@ -19,7 +19,7 @@ This application was (ostensibly) boostrapped with [MHS's Dockerized Rails boots
 
 If you just bootstrapped this application, you are effectively done! Don't forget to set up Heroku if desired. Consider the optional steps below if you want to have a better development experience
 
-For those who come after: when this application was bootstrapped its setup script was wrapped by a new one. The modified script creates and configures your Docker environment, and then runs the original script inside a container running Rails. As such, once `bin/setup` has been run the Dockerized application should be ready for use
+For those who come after: when this application was bootstrapped its `bin/setup` script was wrapped by a new one. The modified script creates and configures your Docker environment, and then runs the original script inside a container running Rails. As such, once `bin/setup` has been run the Dockerized application should be ready for use - just like normal
 
 Here are some suggested, optional steps to make your experience better:
 
@@ -28,17 +28,19 @@ Here are some suggested, optional steps to make your experience better:
 
 ## Dockerization
 
-This application is intended to be used within a Docker container in _all environments_. By default this environment consists of two containers:
+This application is intended to be used within a Docker container in _all environments_. By default this environment consists of three containers:
 
 - *web*: the Rails application
 - *db*: a container running Postgres
+- *webpacker*: a webpack dev server
 
-Note that some environments - notably any that touch Heroku - will only use the web container, and supply the database by overriding the applications settings using the `DATABASE_URL` environment variable
+Note that some environments - notably any that touch Heroku - will only use the web container, and supply the database by overriding the applications settings using the `DATABASE_URL` environment variable. The webpacker container only runs in
+development environments, where frequent, timely asset compilation is a requirement
 
 A fair amount of effort has been put into making sure development of this application is a painless process. In particular:
 
 - Both Dev and CI environments load code, gems, and node modules from Docker volumes, which speeds up package installation (via caching in CI) and should avoid almost all Docker image rebuilds (in Dev)
-- In Dev we use files to maintain bash and pry history so you may use up and down to access old entries just like you would in your normal shell
+- In Dev we use files to maintain bash and pry history so you may access old entries just like you would in your normal shell
 - Dev additionally loads `docker_support/docker.bashrc` when a bash shell starts in a web container; you may add aliases and functions to that file to enable your desired workflow
 
 ## External Services
@@ -84,8 +86,6 @@ Rails tasks (e.g. migrations, DB seeding) should be run within a web container t
 
 ```sh
 docker-compose run web bin/rails a:task
-# ... or ...
-docker-compose run web bundle exec rails a:task
 ```
 
 ## Recommended Aliases
@@ -95,7 +95,7 @@ docker-compose run web bundle exec rails a:task
 Many tasks common to Rails development become very long-winded when working with a fully-Dockerized version of Rails:
 
 - Commands must be prepended with `docker-compose exec web ...` or `docker-compose run web ...` (e.g. gem updates would require `docker-compose run web bundle update [OPTIONS]`)
-- Since Rails not directly accessible, its tasks require `... bin/rails ...` or `... bundle exec rails ...`  (e.g. to run migrations we could use `docker-compose run web bin/rails db:migrate`)
+- Since Rails not directly accessible, its tasks require `... bin/rails ...` (e.g. to run migrations we could use `docker-compose run web bin/rails db:migrate`)
 
 This can be rather frustrating, but is easily mitigated by adding aliases to your shell. These are the ones used by the author:
 
